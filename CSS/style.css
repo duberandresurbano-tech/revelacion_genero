@@ -492,33 +492,42 @@ a { color: inherit; }
     margin-bottom: 32px;
 }
 
+/* 1. Aseguramos que el contenedor sea un cuadrado perfecto y oculte lo que se salga */
 .photo-frame {
-    width: 260px;
-    height: 260px;
-    margin: 0 auto 28px;
-    border-radius: 20px;
-    border: 3px dashed var(--dusty-blue-deep);
-    background: var(--white);
+    position: relative;
+    width: 300px;         /* O el tamaño en px que le hayas puesto a tu cuadro */
+    height: 300px;        /* Debe ser igual al width para que sea un cuadrado perfecto */
+    margin: 0 auto;       /* Centra el cuadro en la pantalla */
+    border-radius: 24px;  /* Los bordes redondeados premium que se ven en tu imagen */
+    overflow: hidden;     /* TRUCO CLAVE: Recorta cualquier parte de la foto que intente salirse */
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    background-color: #f7f4f0; /* Fondo sutil por si la foto tarda en cargar */
 }
 
+/* 2. Estilos para que la ecografía (la etiqueta img) se cuadre sola */
 .photo-frame img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: block;
+    object-fit: cover;       /* TRUCO CLAVE: Centra, escala y llena el cuadrado sin deformar la foto */
+    object-position: center; /* Asegura que el centro de la ecografía sea lo que se vea */
+    position: absolute;      /* Se superpone por encima del placeholder */
+    top: 0;
+    left: 0;
+    z-index: 2;              /* Pasa al frente tapando el texto y el icono del SVG */
 }
 
+/* 3. El placeholder se queda quieto en el fondo */
 .photo-placeholder {
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    color: var(--ink-soft);
+    justify-content: center;
     padding: 20px;
+    text-align: center;
+    z-index: 1;              /* Se queda atrás para que la imagen lo tape al cargar */
 }
 
 .photo-placeholder svg { width: 48px; height: 48px; opacity: 0.5; }
