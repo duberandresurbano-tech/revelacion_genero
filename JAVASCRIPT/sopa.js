@@ -7,6 +7,9 @@ const WORDS_TO_FIND = [
     "PADRES", "SUENO", "ROPA", "ABRAZO", "REVELACION"
 ];
 
+// Colores que se van alternando cada vez que se acierta una palabra: 1ro rosa, 2do azul...
+const HIGHLIGHT_COLORS = ['rgba(255, 99, 178, 0.6)', 'rgba(70, 160, 255, 0.6)'];
+
 let grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
 let foundWordsCount = 0;
 let isSelecting = false;
@@ -26,12 +29,12 @@ function initWordSearch() {
     WORDS_TO_FIND.forEach((word, index) => {
         let placed = false;
         let attempts = 0;
-        
+
         while (!placed && attempts < 100) {
             const direction = Math.random() > 0.5 ? 'H' : 'V'; // Horizontal o Vertical
             const row = Math.floor(Math.random() * GRID_SIZE);
             const col = Math.floor(Math.random() * GRID_SIZE);
-            
+
             if (canPlaceWord(word, row, col, direction)) {
                 placeWord(word, row, col, direction, index);
                 placed = true;
@@ -52,9 +55,12 @@ function initWordSearch() {
 
     // 3. Pintar el tablero en el HTML
     renderGrid();
-    
+
     // 4. Pintar la lista de palabras lateral
     renderWordList();
+
+    // 5. Activar la selección por arrastre (mouse y táctil)
+    setupSelectionEvents();
 }
 
 function canPlaceWord(word, row, col, dir) {
@@ -90,17 +96,14 @@ function renderGrid() {
             cell.dataset.row = r;
             cell.dataset.col = c;
 
-            // Eventos de Mouse (Desktop)
-            cell.addEventListener('mousedown', startSelection);
-            cell.addEventListener('mouseenter', extendSelection);
-            
-            // Evento Simple de Click para facilitar el uso en pantallas móviles táctiles
-            cell.addEventListener('click', handleMobileTap);
+            // Evita que el navegador haga scroll o seleccione texto mientras arrastras
+            cell.style.touchAction = 'none';
+            cell.style.userSelect = 'none';
 
             gridElement.appendChild(cell);
         }
     }
-    window.addEventListener('mouseup', endSelection);
+    gridElement.style.touchAction = 'none';
 }
 
 function renderWordList() {
@@ -115,46 +118,55 @@ function renderWordList() {
     });
 }
 
-// Lógica de Selección por arrastre
-function startSelection(e) {
+// ------------------------------------------------------------------
+// Selección por arrastre usando Pointer Events.
+// Funciona igual con mouse (clic + arrastrar + soltar) y con el dedo
+// en pantallas táctiles (tocar + deslizar + soltar), sin necesidad de
+// manejar mouse y touch por separado.
+// ------------------------------------------------------------------
+function setupSelectionEvents() {
+    gridElement.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('pointermove', onPointerMove, { passive: false });
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointercancel', onPointerUp);
+}
+
+function onPointerDown(e) {
+    const cell = e.target.closest('.grid-cell');
+    if (!cell) return;
+
+    e.preventDefault();
     isSelecting = true;
-    selectedCells = [];
     clearSelectionStyles();
-    extendSelection(e);
+    selectedCells = [];
+    addCellToSelection(cell);
 }
 
-function extendSelection(e) {
+function onPointerMove(e) {
     if (!isSelecting) return;
-    const cell = e.target;
-    if (!cell.classList.contains('grid-cell') || cell.classList.contains('found')) return;
+    e.preventDefault();
 
-    if (!selectedCells.includes(cell)) {
-        cell.classList.add('selected');
-        selectedCells.push(cell);
-    }
+    // Usamos las coordenadas reales del puntero (en vez de e.target) porque
+    // en táctil el navegador "captura" el target original al primer toque.
+    const elAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+    const cell = elAtPoint ? elAtPoint.closest('.grid-cell') : null;
+    addCellToSelection(cell);
 }
 
-function endSelection() {
+function onPointerUp() {
     if (!isSelecting) return;
     isSelecting = false;
     checkSelectedWord();
 }
 
-// Adaptación Inteligente para dispositivos Táctiles Móviles
-function handleMobileTap(e) {
-    const cell = e.target;
+function addCellToSelection(cell) {
+    if (!cell || !gridElement.contains(cell)) return;
     if (cell.classList.contains('found')) return;
 
-    if (cell.classList.contains('selected')) {
-        cell.classList.remove('selected');
-        selectedCells = selectedCells.filter(c => c !== cell);
-    } else {
+    if (!selectedCells.includes(cell)) {
         cell.classList.add('selected');
         selectedCells.push(cell);
     }
-    
-    // Verificamos en cada toque si las celdas marcadas forman alguna palabra de la lista
-    checkSelectedWord();
 }
 
 function clearSelectionStyles() {
@@ -171,9 +183,9 @@ function checkSelectedWord() {
     // Buscamos si estas coordenadas coinciden exactamente con alguna palabra guardada en el mapa
     let match = wordPlacements.find(placement => {
         if (placement.found || placement.cells.length !== selectedCoords.length) return false;
-        
+
         // Validar si cada celda de la palabra está en la selección
-        return placement.cells.every(pCell => 
+        return placement.cells.every(pCell =>
             selectedCoords.some(sCoord => sCoord.r === pCell.r && sCoord.col === pCell.c)
         );
     });
@@ -184,12 +196,16 @@ function checkSelectedWord() {
         foundWordsCount++;
         countElement.textContent = foundWordsCount;
 
+        // Alterna el color de acierto: 1ra palabra rosa, 2da azul, 3ra rosa, etc.
+        const color = HIGHLIGHT_COLORS[(foundWordsCount - 1) % HIGHLIGHT_COLORS.length];
+
         // Cambiamos el estilo visual de las celdas a Acertadas ("found")
         selectedCells.forEach(cell => {
             cell.classList.remove('selected');
             cell.classList.add('found');
+            cell.style.backgroundColor = color;
         });
-        
+
         // Tachamos el elemento de la lista lateral utilizando su índice único
         const wordUiItem = document.getElementById(`word-item-${match.index}`);
         if (wordUiItem) wordUiItem.classList.add('word-found');
@@ -201,9 +217,9 @@ function checkSelectedWord() {
             sopaCta.classList.remove('hidden');
             sopaCta.scrollIntoView({ behavior: 'smooth' });
         }
-    } else if (!isSelecting && selectedCells.length > 5) {
-        // Si soltamos el arrastre y no es correcto, limpiamos para reiniciar la jugada
-        setTimeout(clearSelectionStyles, 300);
+    } else {
+        // Si soltamos y no es correcto, limpiamos para reiniciar la jugada
+        clearSelectionStyles();
         selectedCells = [];
     }
 }
