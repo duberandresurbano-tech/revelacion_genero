@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rasca y Gana — Bebé Jiménez Urbano</title>
+    <title>Rasca y Gana — Bebé Romero Urbano</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,26 +21,46 @@
             <a class="chapter-pill" href="index.html">Capítulo 1 · Bienvenida</a>
             <a class="chapter-pill" href="juego.html">Capítulo 2 · El Juego</a>
             <a class="chapter-pill active" href="rasca.html">Capítulo 3 · Rasca y Gana</a>
-            <a class="chapter-pill" href="revelacion.html">Capítulo 4 · La Revelación</a>
+            <a class="chapter-pill" href="sopa.html">Capítulo 4 · Sopa de Letras</a>
+            <a class="chapter-pill" href="revelacion.html">Capítulo 5 · La Revelación</a>
         </nav>
+        
+        <!-- El botón de éxito al final del rasca ahora te manda directo al Cap 4 -->
+        <div id="scratchCta" class="scratch-cta hidden">
+            <a class="btn btn-primary" href="sopa.html">¡Ir al Capítulo 4: Sopa de Letras! 🔍</a>
+        </div>
 
-        <div class="reveal-wrap">
+        <div class="reveal-wrap" style="max-width: 650px;">
 
-            <h2>Rasca y Gana</h2>
-            <p class="reveal-intro">Usa el dedo o el mouse para raspar la tarjeta y descubrir un pequeño adelanto del secreto.</p>
+            <h2>¿Niño o Niña? 🤔</h2>
+            <p class="reveal-intro">¡Escoge tu bando raspando la tarjeta! ¿Podrás descubrir el secreto antes del gran momento?</p>
 
-            <div class="scratch-wrap">
-                <div class="scratch-reveal" id="scratchReveal">
-                    <div class="scratch-reveal-inner">
-                        <span class="reveal-emoji">💙</span>
-                        <h3>¡Es Niño!</h3>
+            <div class="scratch-container">
+                
+                <!-- Opción Niño (Azul) -->
+                <div class="scratch-wrap scratch-nino">
+                    <div class="scratch-reveal">
+                        <div class="scratch-reveal-inner" id="textNino">
+                            <!-- Se inyecta dinámicamente -->
+                        </div>
                     </div>
+                    <canvas id="canvasNino" width="250" height="250"></canvas>
                 </div>
-                <canvas id="scratchCanvas" width="280" height="280"></canvas>
+
+                <!-- Opción Niña (Rosa) -->
+                <div class="scratch-wrap scratch-nina">
+                    <div class="scratch-reveal">
+                        <div class="scratch-reveal-inner" id="textNina">
+                            <!-- Se inyecta dinámicamente -->
+                        </div>
+                    </div>
+                    <canvas id="canvasNina" width="250" height="250"></canvas>
+                </div>
+
             </div>
 
-            <p class="scratch-hint" id="scratchHint">✨ Desliza para raspar ✨</p>
-            <button class="scratch-skip" id="skipBtn">¿Prefieres revelarlo de una vez? Toca aquí</button>
+            <p class="scratch-hint" id="scratchHint">✨ ¡Puedes raspar ambas si quieres! ✨</p>
+            <button class="scratch-skip" id="skipBtn">¿Te rindes? Ir a la revelación</button>
 
             <div id="scratchCta" class="scratch-cta hidden">
                 <a class="btn btn-primary" href="revelacion.html">Ir a la revelación oficial →</a>

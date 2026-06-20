@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sopa de Letras — Bebé Romero Urbano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+
+    <div class="ambient">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="page">
+
+        <nav class="chapter-nav">
+            <a class="chapter-pill" href="index.html">Capítulo 1 · Bienvenida</a>
+            <a class="chapter-pill" href="juego.html">Capítulo 2 · El Juego</a>
+            <a class="chapter-pill" href="rasca.html">Capítulo 3 · Rasca y Gana</a>
+            <a class="chapter-pill active" href="sopa.html">Capítulo 4 · Sopa de Letras</a>
+            <a class="chapter-pill" href="revelacion.html">Capítulo 5 · La Revelación</a>
+        </nav>
+
+        <div class="wordsearch-layout">
+            <div class="wordsearch-header">
+                <h2>Sopa de Letras Familiar 🔍</h2>
+                <p class="wordsearch-intro">Encuentra los nombres propuestos y las palabras ocultas. ¡Hay un triple misterio esperándote!</p>
+            </div>
+
+            <div class="wordsearch-container">
+                <div class="grid-card">
+                    <div id="wordsearchGrid" class="wordsearch-grid"></div>
+                </div>
+
+                <div class="words-card">
+                    <h3>Palabras por encontrar (<span id="wordsCount">0</span>/20)</h3>
+                    <ul id="wordsList" class="words-list"></ul>
+                </div>
+            </div>
+
+            <<!-- Modifica este botón al final de tu sopa.html para que apunte al Cap 5 -->
+            <div id="sopaCta" class="scratch-cta hidden">
+                <a class="btn btn-primary" href="revelacion.html">¡Ir al Capítulo 5: El Gran Momento Final! 🎈</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../JAVASCRIPT/sopa.js"></script>
+</body>
+</html>

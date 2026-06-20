@@ -1,169 +1,163 @@
-const canvas = document.getElementById('scratchCanvas');
-const ctx = canvas.getContext('2d');
-const scratchWrap = document.querySelector('.scratch-wrap');
-const scratchHint = document.getElementById('scratchHint');
 const scratchCta = document.getElementById('scratchCta');
 const skipBtn = document.getElementById('skipBtn');
+const scratchHint = document.getElementById('scratchHint');
 
-const REVEAL_THRESHOLD = 0.55; // 55% raspado = se revela todo
-let isScratching = false;
-let lastPoint = null;
-let revealed = false;
-let moveCount = 0;
+const REVEAL_THRESHOLD = 0.45; // 45% raspado revela la tarjeta
+let cardsRevealed = 0; // Contador global de control de troleo
 
-drawScratchLayer();
+setupScratchCard('canvasNino', 'textNino', 'nino');
+setupScratchCard('canvasNina', 'textNina', 'nina');
 
-function drawScratchLayer() {
+function setupScratchCard(canvasId, textContainerId, type) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    let isScratching = false;
+    let lastPoint = null;
+    let revealed = false;
+    let moveCount = 0;
+
     const w = canvas.width;
     const h = canvas.height;
-
+    
+    // Pintar la capa gris inicial
     const gradient = ctx.createLinearGradient(0, 0, w, h);
     gradient.addColorStop(0, '#D9D2C4');
     gradient.addColorStop(1, '#B9AF9D');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 6;
-    for (let i = -h; i < w; i += 22) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 4;
+    for (let i = -h; i < w; i += 20) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
         ctx.lineTo(i + h, h);
         ctx.stroke();
     }
 
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    for (let i = 0; i < 14; i++) {
-        const sx = Math.random() * w;
-        const sy = Math.random() * h;
-        drawSparkle(sx, sy, 4 + Math.random() * 5);
-    }
-
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(-Math.PI / 14);
     ctx.fillStyle = '#4A4039';
-    ctx.font = '700 22px Quicksand, sans-serif';
+    ctx.font = '700 18px Quicksand, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('RASPA AQUÍ', 0, -6);
-    ctx.font = '600 15px Quicksand, sans-serif';
-    ctx.fillText('✨ 🪙 ✨', 0, 22);
-    ctx.restore();
-}
+    ctx.fillText('RASPA AQUÍ', w / 2, h / 2);
 
-function drawSparkle(x, y, size) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.beginPath();
-    ctx.moveTo(0, -size);
-    ctx.lineTo(size * 0.3, -size * 0.3);
-    ctx.lineTo(size, 0);
-    ctx.lineTo(size * 0.3, size * 0.3);
-    ctx.lineTo(0, size);
-    ctx.lineTo(-size * 0.3, size * 0.3);
-    ctx.lineTo(-size, 0);
-    ctx.lineTo(-size * 0.3, -size * 0.3);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-}
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const point = e.touches ? e.touches[0] : e;
+        return {
+            x: (point.clientX - rect.left) * scaleX,
+            y: (point.clientY - rect.top) * scaleY
+        };
+    }
 
-function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const point = e.touches ? e.touches[0] : e;
-    return {
-        x: (point.clientX - rect.left) * scaleX,
-        y: (point.clientY - rect.top) * scaleY
+    function scratchAt(x, y) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function scratchLine(p1, p2) {
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const steps = Math.max(1, Math.ceil(dist / 6));
+        for (let i = 0; i <= steps; i++) {
+            const x = p1.x + (p2.x - p1.x) * (i / steps);
+            const y = p1.y + (p2.y - p1.y) * (i / steps);
+            scratchAt(x, y);
+        }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (revealed) return;
+        isScratching = true;
+        lastPoint = getPos(e);
+        scratchAt(lastPoint.x, lastPoint.y);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isScratching || revealed) return;
+        e.preventDefault();
+        const point = getPos(e);
+        scratchLine(lastPoint, point);
+        lastPoint = point;
+        moveCount++;
+        if (moveCount % 5 === 0) checkProgress();
+    });
+
+    const endScratch = () => {
+        isScratching = false;
+        checkProgress();
     };
-}
 
-function scratchAt(x, y) {
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 22, 0, Math.PI * 2);
-    ctx.fill();
-}
+    window.addEventListener('mouseup', endScratch);
+    
+    canvas.addEventListener('touchstart', (e) => {
+        if (revealed) return;
+        isScratching = true;
+        lastPoint = getPos(e);
+        scratchAt(lastPoint.x, lastPoint.y);
+    }, { passive: true });
 
-function scratchLine(p1, p2) {
-    const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-    const steps = Math.max(1, Math.ceil(dist / 8));
-    for (let i = 0; i <= steps; i++) {
-        const x = p1.x + (p2.x - p1.x) * (i / steps);
-        const y = p1.y + (p2.y - p1.y) * (i / steps);
-        scratchAt(x, y);
+    canvas.addEventListener('touchmove', (e) => {
+        if (!isScratching || revealed) return;
+        if (e.cancelable) e.preventDefault();
+        const point = getPos(e);
+        scratchLine(lastPoint, point);
+        lastPoint = point;
+        moveCount++;
+        if (moveCount % 5 === 0) checkProgress();
+    }, { passive: false });
+
+    window.addEventListener('touchend', endScratch);
+
+    function checkProgress() {
+        if (revealed) return;
+        const imageData = ctx.getImageData(0, 0, w, h).data;
+        let transparent = 0;
+        let total = 0;
+        
+        for (let i = 3; i < imageData.length; i += 16) {
+            total++;
+            if (imageData[i] < 30) transparent++;
+        }
+
+        if (transparent / total >= REVEAL_THRESHOLD) {
+            revealed = true;
+            cardsRevealed++; // Sumamos una tarjeta completada al contador global
+            
+            // Asignación de texto dinámico basado en el orden de juego
+            const container = document.getElementById(textContainerId);
+            const decor = type === 'nino' ? '💙' : '💗';
+
+            if (cardsRevealed === 1) {
+                // Mensaje para la PRIMERA tarjeta que abran
+                container.innerHTML = `
+                    <span class="reveal-emoji">😜</span>
+                    <h3>¡Buen intento!<br>Sigan intentando jajajja, lo descubrirán al final... ${decor}</h3>
+                `;
+            } else {
+                // Mensaje para la SEGUNDA tarjeta que abran (El regaño por tramposos)
+                container.innerHTML = `
+                    <span class="reveal-emoji">🤫</span>
+                    <h3>¡Dejen de hacer trampas!<br>Solo sabrán el género del bebé hasta el final... ${decor}</h3>
+                `;
+            }
+
+            canvas.classList.add('faded');
+            setTimeout(() => { canvas.style.display = 'none'; }, 600);
+            
+            scratchHint.textContent = cardsRevealed === 1 ? '¡Qué intriga! 🤫 ¿Vas a mirar la otra?' : '¡Descubriste ambas! Es hora de ir al final.';
+            skipBtn.classList.add('hidden');
+            scratchCta.classList.remove('hidden');
+        }
     }
-}
-
-function startScratch(e) {
-    if (revealed) return;
-    isScratching = true;
-    lastPoint = getPos(e);
-    scratchAt(lastPoint.x, lastPoint.y);
-}
-
-function moveScratch(e) {
-    if (!isScratching || revealed) return;
-    e.preventDefault();
-    const point = getPos(e);
-    scratchLine(lastPoint, point);
-    lastPoint = point;
-
-    moveCount++;
-    if (moveCount % 4 === 0) checkProgress();
-}
-
-function endScratch() {
-    isScratching = false;
-    checkProgress();
-}
-
-canvas.addEventListener('mousedown', startScratch);
-canvas.addEventListener('mousemove', moveScratch);
-window.addEventListener('mouseup', endScratch);
-
-canvas.addEventListener('touchstart', startScratch, { passive: true });
-canvas.addEventListener('touchmove', moveScratch, { passive: false });
-window.addEventListener('touchend', endScratch);
-
-function checkProgress() {
-    if (revealed) return;
-    const w = canvas.width;
-    const h = canvas.height;
-    const imageData = ctx.getImageData(0, 0, w, h).data;
-
-    let transparent = 0;
-    let total = 0;
-    const stride = 4 * 4; // muestreo cada 4 píxeles para rendimiento
-
-    for (let i = 3; i < imageData.length; i += stride) {
-        total++;
-        if (imageData[i] < 30) transparent++;
-    }
-
-    const ratio = transparent / total;
-    if (ratio >= REVEAL_THRESHOLD) revealCard();
-}
-
-function revealCard() {
-    if (revealed) return;
-    revealed = true;
-
-    canvas.classList.add('faded');
-    setTimeout(() => { canvas.style.display = 'none'; }, 650);
-
-    const rect = scratchWrap.getBoundingClientRect();
-    createBurstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
-
-    scratchHint.textContent = '¡Lo lograste! 🎉';
-    skipBtn.classList.add('hidden');
-    scratchCta.classList.remove('hidden');
 }
 
 skipBtn.addEventListener('click', () => {
-    if (revealed) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    revealCard();
+    document.getElementById('canvasNino').style.display = 'none';
+    document.getElementById('canvasNina').style.display = 'none';
+    skipBtn.classList.add('hidden');
+    scratchCta.classList.remove('hidden');
 });
