@@ -11,9 +11,11 @@ const WORDS_TO_FIND = [
 const HIGHLIGHT_COLORS = ['rgba(255, 99, 178, 0.6)', 'rgba(70, 160, 255, 0.6)'];
 
 let grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
+let cellElements = []; // Matriz con la referencia al <div> de cada celda, para acceso rápido
 let foundWordsCount = 0;
 let isSelecting = false;
-let selectedCells = [];
+let startCoord = null;            // Celda donde empezó el arrastre { r, col }
+let currentSelectionCoords = [];  // Celdas resaltadas en este momento
 let wordPlacements = []; // Guarda las posiciones reales de las palabras inyectadas
 
 const gridElement = document.getElementById('wordsearchGrid');
@@ -88,7 +90,10 @@ function placeWord(word, row, col, dir, wordIndex) {
 
 function renderGrid() {
     gridElement.innerHTML = '';
+    cellElements = [];
+
     for (let r = 0; r < GRID_SIZE; r++) {
+        const rowEls = [];
         for (let c = 0; c < GRID_SIZE; c++) {
             const cell = document.createElement('div');
             cell.classList.add('grid-cell');
@@ -101,7 +106,9 @@ function renderGrid() {
             cell.style.userSelect = 'none';
 
             gridElement.appendChild(cell);
+            rowEls.push(cell);
         }
+        cellElements.push(rowEls);
     }
     gridElement.style.touchAction = 'none';
 }
@@ -118,11 +125,15 @@ function renderWordList() {
     });
 }
 
+function getCellElement(r, c) {
+    return cellElements[r] ? cellElements[r][c] : undefined;
+}
+
 // ------------------------------------------------------------------
-// Selección por arrastre usando Pointer Events.
-// Funciona igual con mouse (clic + arrastrar + soltar) y con el dedo
-// en pantallas táctiles (tocar + deslizar + soltar), sin necesidad de
-// manejar mouse y touch por separado.
+// Selección por arrastre, pensada para que sea fácil en celular:
+// no importa si el dedo se desvía un poco de la línea recta, la
+// selección siempre se "endereza" hacia la dirección horizontal o
+// vertical dominante entre la celda inicial y la celda actual.
 // ------------------------------------------------------------------
 function setupSelectionEvents() {
     gridElement.addEventListener('pointerdown', onPointerDown);
@@ -137,49 +148,97 @@ function onPointerDown(e) {
 
     e.preventDefault();
     isSelecting = true;
-    clearSelectionStyles();
-    selectedCells = [];
-    addCellToSelection(cell);
+    startCoord = { r: parseInt(cell.dataset.row), col: parseInt(cell.dataset.col) };
+    updateSelectionVisuals([startCoord]);
 }
 
 function onPointerMove(e) {
-    if (!isSelecting) return;
+    if (!isSelecting || !startCoord) return;
     e.preventDefault();
 
-    // Usamos las coordenadas reales del puntero (en vez de e.target) porque
-    // en táctil el navegador "captura" el target original al primer toque.
-    const elAtPoint = document.elementFromPoint(e.clientX, e.clientY);
-    const cell = elAtPoint ? elAtPoint.closest('.grid-cell') : null;
-    addCellToSelection(cell);
+    const point = getCoordFromPoint(e.clientX, e.clientY);
+    if (!point) return;
+
+    const lineCoords = computeLineCoords(startCoord, point);
+    updateSelectionVisuals(lineCoords);
 }
 
 function onPointerUp() {
     if (!isSelecting) return;
     isSelecting = false;
-    checkSelectedWord();
+    checkSelectedWord(currentSelectionCoords);
+    startCoord = null;
 }
 
-function addCellToSelection(cell) {
-    if (!cell || !gridElement.contains(cell)) return;
-    if (cell.classList.contains('found')) return;
+// Si el dedo se sale un poco del tablero (muy común al estirar hacia
+// la última letra en celular), lo "recortamos" al borde más cercano
+// en vez de perder la selección.
+function getCoordFromPoint(clientX, clientY) {
+    const rect = gridElement.getBoundingClientRect();
+    const x = Math.min(Math.max(clientX, rect.left + 1), rect.right - 1);
+    const y = Math.min(Math.max(clientY, rect.top + 1), rect.bottom - 1);
 
-    if (!selectedCells.includes(cell)) {
-        cell.classList.add('selected');
-        selectedCells.push(cell);
+    const el = document.elementFromPoint(x, y);
+    const cell = el ? el.closest('.grid-cell') : null;
+    if (!cell) return null;
+
+    return { r: parseInt(cell.dataset.row), col: parseInt(cell.dataset.col) };
+}
+
+// Calcula la línea recta horizontal o vertical entre la celda inicial
+// y la celda actual, usando siempre la dirección dominante. Así, un
+// trazo imperfecto (con algo de desvío) igual selecciona la palabra.
+function computeLineCoords(start, current) {
+    const deltaRow = current.r - start.r;
+    const deltaCol = current.col - start.col;
+    const coords = [];
+
+    if (Math.abs(deltaCol) >= Math.abs(deltaRow)) {
+        const dir = deltaCol === 0 ? 0 : Math.sign(deltaCol);
+        const length = Math.abs(deltaCol);
+        for (let i = 0; i <= length; i++) {
+            coords.push({ r: start.r, col: start.col + dir * i });
+        }
+    } else {
+        const dir = Math.sign(deltaRow);
+        const length = Math.abs(deltaRow);
+        for (let i = 0; i <= length; i++) {
+            coords.push({ r: start.r + dir * i, col: start.col });
+        }
     }
+    return coords;
 }
 
-function clearSelectionStyles() {
-    document.querySelectorAll('.grid-cell.selected').forEach(cell => cell.classList.remove('selected'));
+function updateSelectionVisuals(newCoords) {
+    // Quitamos el resaltado "en progreso" de las celdas que ya no aplican
+    currentSelectionCoords.forEach(coord => {
+        const stillSelected = newCoords.some(c => c.r === coord.r && c.col === coord.col);
+        if (!stillSelected) {
+            const cell = getCellElement(coord.r, coord.col);
+            if (cell) cell.classList.remove('selected');
+        }
+    });
+
+    // Resaltamos las celdas nuevas (si aún no están encontradas)
+    newCoords.forEach(coord => {
+        const cell = getCellElement(coord.r, coord.col);
+        if (cell && !cell.classList.contains('found')) {
+            cell.classList.add('selected');
+        }
+    });
+
+    currentSelectionCoords = newCoords;
 }
 
-function checkSelectedWord() {
-    // Extraemos las coordenadas de las celdas actualmente seleccionadas
-    const selectedCoords = selectedCells.map(cell => ({
-        r: parseInt(cell.dataset.row),
-        col: parseInt(cell.dataset.col)
-    }));
+function clearSelectionVisuals() {
+    currentSelectionCoords.forEach(coord => {
+        const cell = getCellElement(coord.r, coord.col);
+        if (cell) cell.classList.remove('selected');
+    });
+    currentSelectionCoords = [];
+}
 
+function checkSelectedWord(selectedCoords) {
     // Buscamos si estas coordenadas coinciden exactamente con alguna palabra guardada en el mapa
     let match = wordPlacements.find(placement => {
         if (placement.found || placement.cells.length !== selectedCoords.length) return false;
@@ -200,17 +259,20 @@ function checkSelectedWord() {
         const color = HIGHLIGHT_COLORS[(foundWordsCount - 1) % HIGHLIGHT_COLORS.length];
 
         // Cambiamos el estilo visual de las celdas a Acertadas ("found")
-        selectedCells.forEach(cell => {
-            cell.classList.remove('selected');
-            cell.classList.add('found');
-            cell.style.backgroundColor = color;
+        selectedCoords.forEach(coord => {
+            const cell = getCellElement(coord.r, coord.col);
+            if (cell) {
+                cell.classList.remove('selected');
+                cell.classList.add('found');
+                cell.style.backgroundColor = color;
+            }
         });
 
         // Tachamos el elemento de la lista lateral utilizando su índice único
         const wordUiItem = document.getElementById(`word-item-${match.index}`);
         if (wordUiItem) wordUiItem.classList.add('word-found');
 
-        selectedCells = [];
+        currentSelectionCoords = [];
 
         // Validamos si ya completó el reto de las 20 palabras ocultas
         if (foundWordsCount === WORDS_TO_FIND.length) {
@@ -219,7 +281,6 @@ function checkSelectedWord() {
         }
     } else {
         // Si soltamos y no es correcto, limpiamos para reiniciar la jugada
-        clearSelectionStyles();
-        selectedCells = [];
+        clearSelectionVisuals();
     }
 }
