@@ -125,20 +125,18 @@ function setupScratchCard(canvasId, textContainerId, type) {
 
         if (transparent / total >= REVEAL_THRESHOLD) {
             revealed = true;
-            cardsRevealed++; // Sumamos una tarjeta completada al contador global
+            cardsRevealed++; 
             
-            // Asignación de texto dinámico basado en el orden de juego
             const container = document.getElementById(textContainerId);
             const decor = type === 'nino' ? '💙' : '💗';
 
             if (cardsRevealed === 1) {
-                // Mensaje para la PRIMERA tarjeta que abran
+                // MODIFICACIÓN SOLICITADA: Mensaje corto, limpio y directo
                 container.innerHTML = `
-                    <span class="reveal-emoji">😜</span>
-                    <h3>¡Buen intento!<br>Sigan intentando jajajja, lo descubrirán al final... ${decor}</h3>
+                    <h3>Buen intento ${decor}</h3>
                 `;
             } else {
-                // Mensaje para la SEGUNDA tarjeta que abran (El regaño por tramposos)
+                // Mensaje para la SEGUNDA tarjeta que abran (Mantiene el misterio)
                 container.innerHTML = `
                     <span class="reveal-emoji">🤫</span>
                     <h3>¡Dejen de hacer trampas!<br>Solo sabrán el género del bebé hasta el final... ${decor}</h3>
@@ -150,7 +148,16 @@ function setupScratchCard(canvasId, textContainerId, type) {
             
             scratchHint.textContent = cardsRevealed === 1 ? '¡Qué intriga! 🤫 ¿Vas a mirar la otra?' : '¡Descubriste ambas! Es hora de ir al final.';
             skipBtn.classList.add('hidden');
-            scratchCta.classList.remove('hidden');
+            
+            // Forzar enlace correcto y texto para el botón dinámico en GitHub Pages
+            if (scratchCta) {
+                const btnLink = scratchCta.querySelector('a');
+                if (btnLink) {
+                    btnLink.setAttribute('href', 'sopa.html');
+                    btnLink.innerHTML = '¡Ir al Capítulo 4: Sopa de Letras! 🔍';
+                }
+                scratchCta.classList.remove('hidden');
+            }
         }
     }
 }
@@ -159,5 +166,13 @@ skipBtn.addEventListener('click', () => {
     document.getElementById('canvasNino').style.display = 'none';
     document.getElementById('canvasNina').style.display = 'none';
     skipBtn.classList.add('hidden');
-    scratchCta.classList.remove('hidden');
+    
+    if (scratchCta) {
+        const btnLink = scratchCta.querySelector('a');
+        if (btnLink) {
+            btnLink.setAttribute('href', 'sopa.html');
+            btnLink.innerHTML = '¡Ir al Capítulo 4: Sopa de Letras! 🔍';
+        }
+        scratchCta.classList.remove('hidden');
+    }
 });
