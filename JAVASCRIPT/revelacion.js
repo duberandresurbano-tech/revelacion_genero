@@ -1,4 +1,4 @@
-const balloon = document.getElementById('balloon');
+    const balloon = document.getElementById('balloon');
 const message = document.getElementById('message');
 const introBlock = document.getElementById('introBlock');
 const hint = document.getElementById('balloonHint');
