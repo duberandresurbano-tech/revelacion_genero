@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Revelación — Bebé Jiménez Urbano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+
+    <div class="ambient">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="page">
+
+        <nav class="chapter-nav">
+            <a class="chapter-pill" href="index.html">Capítulo 1 · Bienvenida</a>
+            <a class="chapter-pill" href="juego.html">Capítulo 2 · El Juego</a>
+            <a class="chapter-pill" href="rasca.html">Capítulo 3 · Rasca y Gana</a>
+            <a class="chapter-pill active" href="revelacion.html">Capítulo 4 · La Revelación</a>
+        </nav>
+
+        <div class="reveal-wrap">
+
+            <div id="introBlock">
+                <h2 id="title">El Gran Momento</h2>
+                <p class="reveal-intro">Esta es la revelación oficial. Toca el globo, aguanta la respiración durante el redoble de tambores, y descubre la verdad.</p>
+            </div>
+
+            <div class="game-area">
+                <div id="balloon" class="balloon"></div>
+                <p class="balloon-hint" id="balloonHint">👆 Toca el globo para revelar el secreto</p>
+            </div>
+
+            <div id="message" class="hidden">
+                <h2>¡Es un Niño! 💙</h2>
+                <p class="reveal-caption">El bebé es hombre</p>
+
+                <div class="photo-frame">
+                    <img id="fotoBebe" src="../IMAGENES/foto-bebe.jpg" alt="Foto del bebé"
+                         onerror="this.style.display='none'; document.getElementById('fotoPlaceholder').style.display='flex';">
+                    <div class="photo-placeholder" id="fotoPlaceholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M21 16l-4.5-4.5a2 2 0 0 0-2.8 0L7 18"/></svg>
+                        <span>Aquí aparecerá la foto del bebé — guárdala como foto-bebe.jpg en la carpeta IMAGENES</span>
+                    </div>
+                </div>
+
+                <p class="family-name">Con todo nuestro amor, Familia Jiménez Urbano</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="../JAVASCRIPT/confetti.js"></script>
+    <script src="../JAVASCRIPT/revelacion.js"></script>
+</body>
+</html>

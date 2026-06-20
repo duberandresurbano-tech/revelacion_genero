@@ -1,0 +1,9 @@
+Para agregar la foto del bebé:
+
+1. Guarda tu imagen en esta carpeta (IMAGENES).
+2. Asegúrate de que el archivo se llame exactamente: foto-bebe.jpg
+   (si tu foto es .png o .jpeg, cambia la extensión en esta línea del archivo
+   HTML/revelacion.html: src="../IMAGENES/foto-bebe.jpg")
+3. ¡Listo! En cuanto el archivo exista, aparecerá automáticamente dentro del
+   marco circular en la página de revelación, reemplazando el ícono de
+   marcador de posición.

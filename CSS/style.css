@@ -1,0 +1,559 @@
+/* ============================================
+   Revelación de Género — Bebé Jiménez Urbano
+   ============================================ */
+
+:root {
+    --cream: #FAF6F0;
+    --cream-deep: #F0E7D8;
+    --ink: #4A4039;
+    --ink-soft: #9C8F81;
+    --dusty-blue: #A8D8EA;
+    --dusty-blue-deep: #5B9BB5;
+    --dusty-pink: #F4C2C2;
+    --dusty-pink-deep: #D98A95;
+    --gold: #D4A95E;
+    --sage: #9CAF88;
+    --white: #FFFFFF;
+
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Quicksand', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: var(--font-body);
+    color: var(--ink);
+    overflow-x: hidden;
+    position: relative;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin: 0;
+}
+
+p { line-height: 1.6; }
+
+a { color: inherit; }
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------- Ambient floating shapes ---------- */
+.ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ambient span {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.35;
+    animation: drift 18s ease-in-out infinite;
+}
+
+.ambient span:nth-child(1) { width: 60px; height: 60px; background: var(--dusty-blue); top: 10%; left: 8%; animation-duration: 16s; }
+.ambient span:nth-child(2) { width: 40px; height: 40px; background: var(--dusty-pink); top: 70%; left: 12%; animation-duration: 20s; animation-delay: -4s; }
+.ambient span:nth-child(3) { width: 80px; height: 80px; background: var(--gold); opacity: 0.18; top: 20%; right: 10%; animation-duration: 22s; animation-delay: -8s; }
+.ambient span:nth-child(4) { width: 50px; height: 50px; background: var(--dusty-pink); top: 80%; right: 16%; animation-duration: 19s; animation-delay: -2s; }
+.ambient span:nth-child(5) { width: 30px; height: 30px; background: var(--dusty-blue); top: 45%; left: 50%; animation-duration: 15s; animation-delay: -6s; }
+.ambient span:nth-child(6) { width: 45px; height: 45px; background: var(--sage); opacity: 0.2; top: 5%; right: 35%; animation-duration: 21s; animation-delay: -10s; }
+
+@keyframes drift {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-30px) translateX(15px); }
+}
+
+/* ---------- Chapter nav ---------- */
+.chapter-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.chapter-pill {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--ink-soft);
+    color: var(--ink-soft);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.chapter-pill:hover { border-color: var(--ink); color: var(--ink); }
+
+.chapter-pill.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+}
+
+/* ---------- Balance emblem (the recurring motif) ---------- */
+.balance-emblem {
+    transform-origin: 100px 30px;
+    animation: sway 4.5s ease-in-out infinite;
+}
+
+.balance-emblem.still { animation: none; }
+
+@keyframes sway {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 38px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover { transform: translateY(-2px) scale(1.02); }
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow: 0 6px 18px rgba(74, 64, 57, 0.25);
+}
+
+.btn-nino {
+    background: var(--dusty-blue);
+    color: #2C5468;
+    box-shadow: 0 6px 16px rgba(91, 155, 181, 0.3);
+}
+
+.btn-nina {
+    background: var(--dusty-pink);
+    color: #7A3640;
+    box-shadow: 0 6px 16px rgba(217, 138, 149, 0.3);
+}
+
+/* ============================================
+   PÁGINA 1 — Bienvenida
+   ============================================ */
+
+.hero {
+    max-width: 640px;
+    text-align: center;
+    margin-top: 24px;
+}
+
+.hero .balance-emblem { margin-bottom: 12px; }
+
+.hero-eyebrow {
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.hero h1 {
+    font-size: clamp(2.1rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    margin-bottom: 18px;
+}
+
+.hero h1 .accent-blue { color: var(--dusty-blue-deep); }
+.hero h1 .accent-pink { color: var(--dusty-pink-deep); }
+
+.hero p.lede {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 0 auto 36px;
+}
+
+.family-name {
+    margin-top: 56px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1rem;
+}
+
+/* ============================================
+   PÁGINA 2 — Juego
+   ============================================ */
+
+.game-wrap {
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+}
+
+.game-wrap h2 { font-size: 1.9rem; margin-bottom: 8px; }
+.game-wrap .game-intro { color: var(--ink-soft); margin-bottom: 28px; font-size: 1rem; }
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: var(--cream-deep);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--dusty-blue-deep), var(--gold), var(--dusty-pink-deep));
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+.progress-label {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.name-card, .question-card, .result-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 36px 30px;
+    box-shadow: 0 12px 30px rgba(74, 64, 57, 0.08);
+}
+
+.name-card input {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1.5px solid var(--cream-deep);
+    margin: 18px 0 26px;
+    text-align: center;
+    background: var(--cream);
+    color: var(--ink);
+}
+
+.name-card input:focus { outline: 2px solid var(--gold); }
+
+.question-card h3 {
+    font-size: 1.35rem;
+    margin-bottom: 30px;
+    line-height: 1.4;
+}
+
+.answer-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.answer-row .btn { flex: 1 1 200px; }
+
+.hidden { display: none !important; }
+
+.result-card h2 { margin-bottom: 6px; }
+.result-card .result-sub { color: var(--ink-soft); margin-bottom: 28px; }
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.bar-label {
+    width: 86px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.bar-track {
+    flex: 1;
+    height: 18px;
+    background: var(--cream-deep);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bar-fill.nino { background: linear-gradient(90deg, var(--dusty-blue), var(--dusty-blue-deep)); }
+.bar-fill.nina { background: linear-gradient(90deg, var(--dusty-pink), var(--dusty-pink-deep)); }
+
+.bar-pct {
+    width: 46px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.result-card .btn-primary { margin-top: 30px; }
+
+/* ============================================
+   PÁGINA 3 — Rasca y Gana
+   ============================================ */
+
+.scratch-wrap {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto 22px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(74, 64, 57, 0.12);
+}
+
+.scratch-reveal {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, var(--dusty-blue), var(--dusty-blue-deep));
+}
+
+.scratch-reveal-inner {
+    text-align: center;
+    color: var(--white);
+}
+
+.scratch-reveal-inner .reveal-emoji {
+    font-size: 3.4rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.scratch-reveal-inner h3 {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    color: var(--white);
+}
+
+#scratchCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    touch-action: none;
+}
+
+#scratchCanvas.faded {
+    transition: opacity 0.6s ease;
+    opacity: 0;
+}
+
+.scratch-hint {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 26px;
+}
+
+.scratch-skip {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+.scratch-skip:hover { color: var(--ink); }
+
+.scratch-cta {
+    margin-top: 22px;
+}
+
+/* ============================================
+   PÁGINA 4 — Revelación
+   ============================================ */
+
+.reveal-wrap {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+}
+
+.reveal-wrap h2 { font-size: 1.9rem; margin-bottom: 8px; }
+.reveal-wrap .reveal-intro { color: var(--ink-soft); margin-bottom: 40px; }
+
+.game-area { margin-bottom: 10px; }
+
+.balloon {
+    width: 130px;
+    height: 158px;
+    background: radial-gradient(circle at 35% 30%, #E9E3D8, var(--cream-deep) 70%);
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    position: relative;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: transform 0.2s;
+    box-shadow: inset -12px -12px 18px rgba(74, 64, 57, 0.08), 0 12px 24px rgba(74, 64, 57, 0.1);
+}
+
+.balloon:hover { transform: scale(1.05); }
+
+.balloon.suspense {
+    animation: balloonShake 0.16s ease-in-out infinite;
+    cursor: default;
+}
+
+@keyframes balloonShake {
+    0%, 100% { transform: rotate(-3deg) scale(1.03); }
+    50% { transform: rotate(3deg) scale(1.07); }
+}
+
+.balloon-hint.suspense-hint {
+    color: var(--gold);
+    animation: pulseText 0.5s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.balloon::before {
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 16px solid var(--cream-deep);
+}
+
+.balloon-hint {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.pop { animation: explode 0.3s forwards; }
+
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.85; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+#message {
+    animation: fadeIn 0.9s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#message h2 {
+    font-size: 2.6rem;
+    color: var(--dusty-blue-deep);
+    margin-bottom: 6px;
+}
+
+#message .reveal-caption {
+    color: var(--ink-soft);
+    margin-bottom: 32px;
+}
+
+.photo-frame {
+    width: 260px;
+    height: 260px;
+    margin: 0 auto 28px;
+    border-radius: 20px;
+    border: 3px dashed var(--dusty-blue-deep);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-soft);
+    padding: 20px;
+}
+
+.photo-placeholder svg { width: 48px; height: 48px; opacity: 0.5; }
+.photo-placeholder span { font-size: 0.78rem; font-weight: 600; max-width: 180px; }
+
+/* Confetti / particles */
+.particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.confetti-fall {
+    position: fixed;
+    top: -20px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    .answer-row { flex-direction: column; }
+    .answer-row .btn { flex: 1 1 auto; width: 100%; }
+    .name-card, .question-card, .result-card { padding: 28px 20px; }
+    .scratch-wrap { width: 240px; height: 240px; }
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasca y Gana — Bebé Jiménez Urbano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+
+    <div class="ambient">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="page">
+
+        <nav class="chapter-nav">
+            <a class="chapter-pill" href="index.html">Capítulo 1 · Bienvenida</a>
+            <a class="chapter-pill" href="juego.html">Capítulo 2 · El Juego</a>
+            <a class="chapter-pill active" href="rasca.html">Capítulo 3 · Rasca y Gana</a>
+            <a class="chapter-pill" href="revelacion.html">Capítulo 4 · La Revelación</a>
+        </nav>
+
+        <div class="reveal-wrap">
+
+            <h2>Rasca y Gana</h2>
+            <p class="reveal-intro">Usa el dedo o el mouse para raspar la tarjeta y descubrir un pequeño adelanto del secreto.</p>
+
+            <div class="scratch-wrap">
+                <div class="scratch-reveal" id="scratchReveal">
+                    <div class="scratch-reveal-inner">
+                        <span class="reveal-emoji">💙</span>
+                        <h3>¡Es Niño!</h3>
+                    </div>
+                </div>
+                <canvas id="scratchCanvas" width="280" height="280"></canvas>
+            </div>
+
+            <p class="scratch-hint" id="scratchHint">✨ Desliza para raspar ✨</p>
+            <button class="scratch-skip" id="skipBtn">¿Prefieres revelarlo de una vez? Toca aquí</button>
+
+            <div id="scratchCta" class="scratch-cta hidden">
+                <a class="btn btn-primary" href="revelacion.html">Ir a la revelación oficial →</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="../JAVASCRIPT/confetti.js"></script>
+    <script src="../JAVASCRIPT/rasca.js"></script>
+</body>
+</html>
